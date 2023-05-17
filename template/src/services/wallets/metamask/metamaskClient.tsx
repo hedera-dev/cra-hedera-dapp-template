@@ -58,17 +58,25 @@ export const connectToMetamask = async () => {
 }
 
 class MetaMaskWallet implements WalletInterface {
+  private convertAccountIdToSolidityAddress(accountId: AccountId): string {
+    let accountIdString = accountId.toString();
+    if (accountId.evmAddress !== null) {
+      accountIdString = accountId.evmAddress.toString();
+    }
+
+    return `0x${accountIdString}`;
+  }
 
   // Purpose: Transfer HBAR
   // Returns: Promise<string>
   // Note: As of May 2023, on testnet mirror node we cannot query for a transction using the transaction hash 
   // thats why we return a string instead of a TransactionId
-  async transferHBAR(toAddress: AccountId | string, amount: number) {
-    const signer = await provider.getSigner();
+  async transferHBAR(toAddress: AccountId, amount: number) {
+    const signer = await provider.getSigner();    
     //const txCount = await provider.getTransactionCount(from);
     // build the transaction
     const tx = await signer.populateTransaction({
-      to: toAddress.toString(),
+      to: this.convertAccountIdToSolidityAddress(toAddress),
       value: ethers.parseEther(amount.toString()),
     });
 
@@ -79,7 +87,7 @@ class MetaMaskWallet implements WalletInterface {
     return hash;
   }
 
-  async transferToken(toAddress: AccountId | string, tokenId: TokenId, amount: number) {
+  async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     const hash = await this.executeContractCall(
       ContractId.fromString(tokenId.toString()),
       'transfer',
@@ -87,7 +95,7 @@ class MetaMaskWallet implements WalletInterface {
         .addParam({
           type: "address",
           name: "recipient",
-          value: toAddress.toString()
+          value: this.convertAccountIdToSolidityAddress(toAddress)
         })
         .addParam({
           type: "uint256",

@@ -15,7 +15,7 @@ const appMetadata = {
 export const bladeSigner = new BladeSigner();
 
 class BladeWallet implements WalletInterface {
-  async transferHBAR(toAddress: AccountId | string, amount: number) {
+  async transferHBAR(toAddress: AccountId, amount: number) {
     // TODO: why does bladesigners account id need to be coverterted to a string?
     const transferHBARTransaction = await new TransferTransaction()
       .addHbarTransfer(bladeSigner.getAccountId().toString(), -amount)
@@ -26,7 +26,7 @@ class BladeWallet implements WalletInterface {
     return txResult.transactionId;
   }
 
-  async transferToken(toAddress: AccountId | string, tokenId: TokenId, amount: number) {
+  async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     // TODO: why does bladesigners account id need to be coverterted to a string?
     const transferTokenTransaction = await new TransferTransaction()
       .addTokenTransfer(tokenId, bladeSigner.getAccountId().toString(), -amount)

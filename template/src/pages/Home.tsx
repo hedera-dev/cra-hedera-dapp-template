@@ -1,4 +1,4 @@
-import { ContractId, TokenId } from "@hashgraph/sdk";
+import { AccountId, ContractId, TokenId } from "@hashgraph/sdk";
 import { Button, TextField, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import { ContractFunctionParameterBuilder } from "../services/wallets/contractFunctionParameterBuilder";
@@ -50,7 +50,7 @@ export default function Home() {
             <Button
               variant='contained'
               onClick={async () => {
-                const txId = await walletInterface.transferHBAR(toAccountId, amount);
+                const txId = await walletInterface.transferHBAR(AccountId.fromString(toAccountId), amount);
               }}
             >
               <SendIcon />

@@ -18,7 +18,7 @@ class HashConnectWallet implements WalletInterface {
     return hashConnect.getSigner(provider);
   }
 
-  async transferHBAR(toAddress: AccountId | string, amount: number) {
+  async transferHBAR(toAddress: AccountId, amount: number) {
     // Grab the topic and account to sign from the last pairing event
     const signer = this.getSigner();
 
@@ -31,7 +31,7 @@ class HashConnectWallet implements WalletInterface {
     return txResult.transactionId;
   }
 
-  async transferToken(toAddress: AccountId | string, tokenId: TokenId, amount: number) {
+  async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     // Grab the topic and account to sign from the last pairing event
     const signer = this.getSigner();
 
