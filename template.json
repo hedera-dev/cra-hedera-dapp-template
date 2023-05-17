@@ -1,0 +1,19 @@
+{
+  "package": {
+    "dependencies": {
+      "@types/node": "^16.7.13",
+      "@types/react": "^18.0.0",
+      "@types/react-dom": "^18.0.0",
+      "@bladelabs/blade-web3.js": "0.9.14",
+      "@emotion/react": "^11.x",
+      "@emotion/styled": "^11.x",
+      "@hashgraph/sdk": "^2.24.1",
+      "@mui/icons-material": "^5.x",
+      "@mui/material": "^5.x",
+      "ethers": "^6.3.0",
+      "hashconnect": "^0.2.3",
+      "react-router-dom": "^6.9.0",
+      "typescript": "^4.4.2"
+    }
+  }
+}
