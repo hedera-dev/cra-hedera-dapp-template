@@ -16,7 +16,7 @@ export const bladeSigner = new BladeSigner();
 
 class BladeWallet implements WalletInterface {
   async transferHBAR(toAddress: AccountId, amount: number) {
-    // TODO: why does bladesigners account id need to be coverterted to a string?
+    // TODO: why does bladesigners account id need to be converted to a string?
     const transferHBARTransaction = await new TransferTransaction()
       .addHbarTransfer(bladeSigner.getAccountId().toString(), -amount)
       .addHbarTransfer(toAddress, amount)
