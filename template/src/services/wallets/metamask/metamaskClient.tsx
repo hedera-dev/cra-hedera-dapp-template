@@ -2,15 +2,18 @@ import { ContractId, AccountId } from "@hashgraph/sdk";
 import { TokenId } from "@hashgraph/sdk/lib/transaction/TransactionRecord";
 import { ethers } from "ethers";
 import { useContext, useEffect } from "react";
+import { appConfig } from "../../../config";
 import { MetamaskContext } from "../../../contexts/MetamaskContext";
 import { ContractFunctionParameterBuilder } from "../contractFunctionParameterBuilder";
 import { WalletInterface } from "../walletInterface";
-// NOTE: uses the v6 of ethers.js
+
+const currentNetworkConfig = appConfig.networks.testnet;
+
 export const switchToHederaNetwork = async (ethereum: any) => {
   try {
     await ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x128' }] // chainId must be in hexadecimal numbers
+      params: [{ chainId: currentNetworkConfig.chainId }] // chainId must be in hexadecimal numbers
     });
   } catch (error: any) {
     if (error.code === 4902) {
@@ -19,14 +22,14 @@ export const switchToHederaNetwork = async (ethereum: any) => {
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainName: 'Hedera Testnet',
-              chainId: '0x128',
+              chainName: `Hedera (${currentNetworkConfig.network})`,
+              chainId: currentNetworkConfig.chainId,
               nativeCurrency: {
                 name: 'HBAR',
                 symbol: 'HBAR',
                 decimals: 18
               },
-              rpcUrls: ['https://testnet.hashio.io/api']
+              rpcUrls: [currentNetworkConfig.jsonRpcUrl]
             },
           ],
         });
@@ -39,7 +42,8 @@ export const switchToHederaNetwork = async (ethereum: any) => {
 }
 
 const { ethereum } = window as any;
-const provider = new ethers.BrowserProvider(ethereum);
+const provider = new ethers.providers.Web3Provider(ethereum);
+
 
 
 // returns a list of accounts
@@ -52,43 +56,54 @@ export const connectToMetamask = async () => {
   // keep track of accounts returned
   let accounts: string[] = []
 
-  await switchToHederaNetwork(ethereum);
-  accounts = await provider.send("eth_requestAccounts", []);
+  try {
+    await switchToHederaNetwork(ethereum);
+    accounts = await provider.send("eth_requestAccounts", []);
+  } catch (error: any) {
+    if (error.code === 4001) {
+      // EIP-1193 userRejectedRequest error
+      console.warn("Please connect to Metamask.");
+    } else {
+      console.error(error);
+    }
+  }
+
   return accounts;
 }
 
 class MetaMaskWallet implements WalletInterface {
   private convertAccountIdToSolidityAddress(accountId: AccountId): string {
-    let accountIdString = accountId.toString();
-    if (accountId.evmAddress !== null) {
-      accountIdString = accountId.evmAddress.toString();
-    }
+    const accountIdString = accountId.evmAddress !== null
+      ? accountId.evmAddress.toString()
+      : accountId.toSolidityAddress();
 
     return `0x${accountIdString}`;
   }
 
   // Purpose: Transfer HBAR
   // Returns: Promise<string>
-  // Note: As of May 2023, on testnet mirror node we cannot query for a transction using the transaction hash 
-  // thats why we return a string instead of a TransactionId
+  // Note: Use JSON RPC Relay to search by transaction hash
   async transferHBAR(toAddress: AccountId, amount: number) {
-    const signer = await provider.getSigner();    
-    //const txCount = await provider.getTransactionCount(from);
+    const signer = await provider.getSigner();
     // build the transaction
     const tx = await signer.populateTransaction({
       to: this.convertAccountIdToSolidityAddress(toAddress),
-      value: ethers.parseEther(amount.toString()),
+      value: ethers.utils.parseEther(amount.toString()),
     });
+    try {
+      // send the transaction
+      const { hash } = await signer.sendTransaction(tx);
+      await provider.waitForTransaction(hash);
 
-    // send the transaction
-    const { hash } = await signer.sendTransaction(tx);
-    await provider.waitForTransaction(hash);
-
-    return hash;
+      return hash;
+    } catch (error: any) {
+      console.warn(error.message ? error.message : error);
+      return null;
+    }
   }
 
   async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
-    const hash = await this.executeContractCall(
+    const hash = await this.executeContractFunction(
       ContractId.fromString(tokenId.toString()),
       'transfer',
       new ContractFunctionParameterBuilder()
@@ -102,7 +117,7 @@ class MetaMaskWallet implements WalletInterface {
           name: "amount",
           value: amount
         }),
-      -1 // gas limit is unused for metamask contract calls
+      50000
     );
 
     return hash;
@@ -110,11 +125,11 @@ class MetaMaskWallet implements WalletInterface {
 
   async associateToken(tokenId: TokenId) {
     // send the transaction
-    const hash = await this.executeContractCall(
+    const hash = await this.executeContractFunction(
       ContractId.fromString(tokenId.toString()),
       'associate',
       new ContractFunctionParameterBuilder(),
-      -1 // gas limit is unused for metamask contract calls
+      50000
     );
 
     return hash;
@@ -122,19 +137,29 @@ class MetaMaskWallet implements WalletInterface {
 
   // Purpose: build contract execute transaction and send to hashconnect for signing and execution
   // Returns: Promise<TransactionId | null>
-  async executeContractCall(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
+  async executeContractFunction(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
     const signer = await provider.getSigner();
     const abi = [
       `function ${functionName}(${functionParameters.buildAbiFunctionParams()})`
     ];
 
     // create contract instance for the contract id
-    // to call the function, use contract[functionName](functionParameters)
+    // to call the function, use contract[functionName](...functionParameters, ethersOverrides)
     const contract = new ethers.Contract(`0x${contractId.toSolidityAddress()}`, abi, signer);
-    const txResult = await contract[functionName](...functionParameters.buildEthersParams());
-
-    return txResult.hash;
+    try {
+      const txResult = await contract[functionName](
+        ...functionParameters.buildEthersParams(),
+        {
+          gasLimit: gasLimit
+        }
+      );
+      return txResult.hash;
+    } catch (error: any) {
+      console.warn(error.message ? error.message : error);
+      return null;
+    }
   }
+
   disconnect() {
     alert("Please disconnect using the Metamask extension.")
   }
@@ -148,7 +173,7 @@ export const MetaMaskClient = () => {
     // set the account address if already connected
     provider.listAccounts().then((signers) => {
       if (signers.length !== 0) {
-        setMetamaskAccountAddress(signers[0].address);
+        setMetamaskAccountAddress(signers[0]);
       } else {
         setMetamaskAccountAddress("");
       }

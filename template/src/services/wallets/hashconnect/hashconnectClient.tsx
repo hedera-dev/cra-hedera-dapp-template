@@ -4,9 +4,11 @@ import { useCallback, useContext, useEffect } from 'react';
 import { WalletInterface } from "../walletInterface";
 import { AccountId, ContractExecuteTransaction, ContractId, TokenAssociateTransaction, TokenId, TransferTransaction } from "@hashgraph/sdk";
 import { ContractFunctionParameterBuilder } from "../contractFunctionParameterBuilder";
+import { appConfig } from "../../../config";
 
 
-const env = "testnet";
+const currentNetworkConfig = appConfig.networks.testnet;
+const hederaNetwork = currentNetworkConfig.network;
 
 export const hashConnect = new HashConnect();
 
@@ -14,7 +16,7 @@ class HashConnectWallet implements WalletInterface {
 
   private getSigner() {
     const pairingData = hashConnect.hcData.pairingData[hashConnect.hcData.pairingData.length - 1];
-    const provider = hashConnect.getProvider(env, pairingData.topic, pairingData.accountIds[0]);
+    const provider = hashConnect.getProvider(hederaNetwork, pairingData.topic, pairingData.accountIds[0]);
     return hashConnect.getSigner(provider);
   }
 
@@ -51,18 +53,18 @@ class HashConnectWallet implements WalletInterface {
       .setAccountId(signer.getAccountId())
       .setTokenIds([tokenId])
       .freezeWithSigner(signer);
-    
+
     const txResult = await associateTokenTransaction.executeWithSigner(signer);
     return txResult.transactionId;
   }
 
   // Purpose: build contract execute transaction and send to hashconnect for signing and execution
   // Returns: Promise<TransactionId | null>
-  async executeContractCall(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
+  async executeContractFunction(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
     // Grab the topic and account to sign from the last pairing event
     const pairingData = hashConnect.hcData.pairingData[hashConnect.hcData.pairingData.length - 1];
 
-    const provider = hashConnect.getProvider(env, pairingData.topic, pairingData.accountIds[0]);
+    const provider = hashConnect.getProvider(hederaNetwork, pairingData.topic, pairingData.accountIds[0]);
     const signer = hashConnect.getSigner(provider);
 
     const tx = new ContractExecuteTransaction()
@@ -102,7 +104,7 @@ const hashConnectInitPromise = new Promise(async (resolve) => {
     description: "Hedera CRA Template",
     icon: window.location.origin + "/logo192.png"
   };
-  const initResult = await hashConnect.init(appMetadata, env, true)
+  const initResult = await hashConnect.init(appMetadata, hederaNetwork, true)
   resolve(initResult);
 });
 

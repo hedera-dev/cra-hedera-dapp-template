@@ -1,5 +1,5 @@
 {
-  "name": "cra-template-hedera-theme",
+  "name": "cra-hedera-dapp-template",
   "version": "1.0.0",
   "keywords": [
     "react",
@@ -17,9 +17,9 @@
     "url": "",
     "directory": ""
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "template",

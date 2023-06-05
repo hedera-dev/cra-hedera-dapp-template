@@ -16,7 +16,6 @@ export const bladeSigner = new BladeSigner();
 
 class BladeWallet implements WalletInterface {
   async transferHBAR(toAddress: AccountId, amount: number) {
-    // TODO: why does bladesigners account id need to be converted to a string?
     const transferHBARTransaction = await new TransferTransaction()
       .addHbarTransfer(bladeSigner.getAccountId().toString(), -amount)
       .addHbarTransfer(toAddress, amount)
@@ -27,7 +26,6 @@ class BladeWallet implements WalletInterface {
   }
 
   async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
-    // TODO: why does bladesigners account id need to be coverterted to a string?
     const transferTokenTransaction = await new TransferTransaction()
       .addTokenTransfer(tokenId, bladeSigner.getAccountId().toString(), -amount)
       .addTokenTransfer(tokenId, toAddress, amount)
@@ -38,7 +36,6 @@ class BladeWallet implements WalletInterface {
   }
 
   async associateToken(tokenId: TokenId) {
-    // TODO: why does bladesigners account id need to be coverterted to a string?
     const associateTokenTransaction = await new TokenAssociateTransaction()
       .setAccountId(bladeSigner.getAccountId().toString())
       .setTokenIds([tokenId])
@@ -50,7 +47,7 @@ class BladeWallet implements WalletInterface {
 
   // Purpose: build contract execute transaction and send to hashconnect for signing and execution
   // Returns: Promise<TransactionId | null>
-  async executeContractCall(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
+  async executeContractFunction(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
     // Grab the topic and account to sign from the last pairing event
     const tx = new ContractExecuteTransaction()
       .setContractId(contractId)

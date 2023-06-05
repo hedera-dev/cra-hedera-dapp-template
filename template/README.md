@@ -64,23 +64,47 @@ Hedera DApp Starter Template using Create React App, Material UI and Typescript 
   Associate Token
 </Button>
 ```
-### Executing Two Contract Calls
+### Executing Two Contract Functions
 
 ```tsx
 <Button
   variant='contained'
   onClick={async () => {
-    const txId = await walletInterface.executeContractCall(ContractId.fromString(contractId), "createTodo", new ContractFunctionParameterBuilder().addParam({ type: "string", name: "todoName", value: "Testing Totoro" }), 5000000);
+    const txId = await walletInterface.executeContractFunction(ContractId.fromString(contractId), "createTodo", new ContractFunctionParameterBuilder().addParam({ type: "string", name: "todoName", value: "Testing Totoro" }), 5000000);
   }}
 >
-  Execute Contract Call
+  Execute Contract Function
 </Button>
 <Button
   variant='contained'
   onClick={async () => {
-    const txId = await walletInterface.executeContractCall(ContractId.fromString(contractId), "getTodoById", new ContractFunctionParameterBuilder().addParam({ type: "uint256", name: "todoId", value: 1 }), 5000000);
+    const txId = await walletInterface.executeContractFunction(ContractId.fromString(contractId), "getTodoById", new ContractFunctionParameterBuilder().addParam({ type: "uint256", name: "todoId", value: 1 }), 5000000);
   }}
 >
-  Execute Contract Call 2
+  Execute Contract Function 2
 </Button>
 ```
+### Mirror Node Query: Get Account Info By Account Id
+
+```tsx
+{/* Example: Mirror Node Query */}
+<Stack>
+  <Button
+    variant='contained'
+    onClick={async () => {
+      const mirrorNodeClient = new MirrorNodeClient(appConfig.networks.testnet);
+      const accountInfo = await mirrorNodeClient.getAccountInfo(accountId);
+      console.log(accountInfo.balance);
+    }}
+  >
+    Query for AccountInfo
+  </Button>
+</Stack>
+```
+
+## JSON RPC Relay Endpoint Alternatives
+### Set up your own Hedera JSON RPC relay
+Check out the Hedera JSON RPC relay GitHub repo [here](https://github.com/hashgraph/hedera-json-rpc-relay) and set up an RPC relay to run locally.
+
+### Arkhia
+Arkhia offers another community JSON RPC relay that you can leverage. Sign up for free and get started [here](https://www.arkhia.io/features/#api-services).

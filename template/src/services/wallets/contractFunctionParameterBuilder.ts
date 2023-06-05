@@ -35,6 +35,11 @@ export class ContractFunctionParameterBuilder {
   public buildHAPIParams(): ContractFunctionParameters {
     const contractFunctionParams = new ContractFunctionParameters();
     for (const param of this.params) {
+      // make sure type only contains alphanumeric characters (no spaces, no special characters, no whitespace), make sure it does not start with a number
+      const alphanumericIdentifier: RegExp = /^[a-zA-Z][a-zA-Z0-9]*$/;
+      if (!param.type.match(alphanumericIdentifier)) {
+        throw new Error(`Invalid type: ${param.type}. Type must only contain alphanumeric characters.`);
+      }
       // captitalize the first letter of the type
       const type = param.type.charAt(0).toUpperCase() + param.type.slice(1);
       const functionName = `add${type}`;
