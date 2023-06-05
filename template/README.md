@@ -108,7 +108,6 @@ Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera
 ### Mirror Node Query: Get Account Info By Account Id
 
 ```tsx
-{/* Example: Mirror Node Query */}
 <Stack>
   <Button
     variant='contained'
@@ -118,7 +117,7 @@ Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera
       console.log(accountInfo.balance);
     }}
   >
-    Query for AccountInfo
+    Query for Account Info
   </Button>
 </Stack>
 ```
