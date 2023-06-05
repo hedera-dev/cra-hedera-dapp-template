@@ -42,16 +42,18 @@ export const switchToHederaNetwork = async (ethereum: any) => {
 }
 
 const { ethereum } = window as any;
-const provider = new ethers.providers.Web3Provider(ethereum);
+const getProvider = () => {
+  if (!ethereum) {
+    throw new Error("Metamask is not installed! Go install the extension!");
+  }
 
-
+  return new ethers.providers.Web3Provider(ethereum);
+}
 
 // returns a list of accounts
 // otherwise empty array
 export const connectToMetamask = async () => {
-  if (!ethereum) {
-    throw new Error("Metamask is not installed! Go install the extension!");
-  }
+  const provider = getProvider();
 
   // keep track of accounts returned
   let accounts: string[] = []
@@ -84,6 +86,7 @@ class MetaMaskWallet implements WalletInterface {
   // Returns: Promise<string>
   // Note: Use JSON RPC Relay to search by transaction hash
   async transferHBAR(toAddress: AccountId, amount: number) {
+    const provider = getProvider();
     const signer = await provider.getSigner();
     // build the transaction
     const tx = await signer.populateTransaction({
@@ -138,6 +141,7 @@ class MetaMaskWallet implements WalletInterface {
   // Purpose: build contract execute transaction and send to hashconnect for signing and execution
   // Returns: Promise<TransactionId | null>
   async executeContractFunction(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
+    const provider = getProvider();
     const signer = await provider.getSigner();
     const abi = [
       `function ${functionName}(${functionParameters.buildAbiFunctionParams()})`
@@ -171,26 +175,31 @@ export const MetaMaskClient = () => {
   const { setMetamaskAccountAddress } = useContext(MetamaskContext);
   useEffect(() => {
     // set the account address if already connected
-    provider.listAccounts().then((signers) => {
-      if (signers.length !== 0) {
-        setMetamaskAccountAddress(signers[0]);
-      } else {
-        setMetamaskAccountAddress("");
+    try {
+      const provider = getProvider();
+      provider.listAccounts().then((signers) => {
+        if (signers.length !== 0) {
+          setMetamaskAccountAddress(signers[0]);
+        } else {
+          setMetamaskAccountAddress("");
+        }
+      });
+  
+      // listen for account changes and update the account address
+      ethereum.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length !== 0) {
+          setMetamaskAccountAddress(accounts[0]);
+        } else {
+          setMetamaskAccountAddress("");
+        }
+      });
+  
+      // cleanup by removing listeners
+      return () => {
+        ethereum.removeAllListeners("accountsChanged");
       }
-    });
-
-    // listen for account changes and update the account address
-    ethereum.on("accountsChanged", (accounts: string[]) => {
-      if (accounts.length !== 0) {
-        setMetamaskAccountAddress(accounts[0]);
-      } else {
-        setMetamaskAccountAddress("");
-      }
-    });
-
-    // cleanup by removing listeners
-    return () => {
-      ethereum.removeAllListeners("accountsChanged");
+    } catch (error: any) {
+      console.error(error.message ? error.message : error);
     }
   }, [setMetamaskAccountAddress]);
 
