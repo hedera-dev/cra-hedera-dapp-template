@@ -1,9 +1,30 @@
 Hedera DApp Starter Template using Create React App, Material UI and Typescript with HashPack, Blade, and MetaMask wallet support.
 
-### How to use
+## Prerequisites
+Have a Hedera testnet account. 
+Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera.com/register). This testnet account will recieve 10,000 test HBAR every 24 hours!
+
+### Hashpack Wallet
+* Install the [Hashpack extension](https://chrome.google.com/webstore/detail/hashpack/gjagmgiddbbciopjhllkdnddhcglnemk).  
+* Import a Hedera ED25519 testnet account into Hashpack.
+
+### Blade Wallet
+* Install the [Blade extension](https://chrome.google.com/webstore/detail/blade-%E2%80%93-hedera-web3-digit/abogmiocnneedmmepnohnhlijcjpcifd).  
+* Import a Hedera ED25519 testnet account into Blade.
+
+### Metamask Wallet
+* Install the [MetaMask extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn).  
+  #### How to activate your account on Hedera testnet
+  * Activate it by transferring any amount of test HBAR to your evm address
+
+-----
+
+## How to use
 ```npx create-react-app <app-name> --template hedera-dapp-template ```
 
 > Blade requires the use of HTTPS in order to pair wallets. An `.env` file exists in your root directory with `HTTPS=true` in order to connect to blade.
+
+----
 
 ## Examples
 ### Transfer HBAR
@@ -101,6 +122,8 @@ Hedera DApp Starter Template using Create React App, Material UI and Typescript 
   </Button>
 </Stack>
 ```
+
+---
 
 ## JSON RPC Relay Endpoint Alternatives
 ### Set up your own Hedera JSON RPC relay
