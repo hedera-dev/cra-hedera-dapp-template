@@ -1,7 +1,9 @@
 Hedera DApp Starter Template using Create React App, Material UI and Typescript with HashPack, Blade, and MetaMask wallet support.
 
 ## Prerequisites
-Have a Hedera testnet account. 
+
+### Hedera Testnet account
+
 Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera.com/register). This testnet account will recieve 10,000 test HBAR every 24 hours!
 
 ### Hashpack Wallet
