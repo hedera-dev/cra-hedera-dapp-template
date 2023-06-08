@@ -16,8 +16,10 @@ Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera
 
 ### Metamask Wallet
 * Install the [MetaMask extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn).  
-  #### How to activate your account on Hedera testnet
-  * Activate it by transferring any amount of test HBAR to your evm address
+
+#### How to activate your account on Hedera Testnet
+
+* Activate it by transferring any amount of test HBAR to your EVM address
 
 -----
 
