@@ -120,7 +120,7 @@ class MetaMaskWallet implements WalletInterface {
           name: "amount",
           value: amount
         }),
-      50000
+      appConfig.constants.METAMASK_GAS_LIMIT_TRANSFER
     );
 
     return hash;
@@ -132,7 +132,7 @@ class MetaMaskWallet implements WalletInterface {
       ContractId.fromString(tokenId.toString()),
       'associate',
       new ContractFunctionParameterBuilder(),
-      50000
+      appConfig.constants.METAMASK_GAS_LIMIT_ASSOCIATE
     );
 
     return hash;
@@ -184,7 +184,7 @@ export const MetaMaskClient = () => {
           setMetamaskAccountAddress("");
         }
       });
-  
+
       // listen for account changes and update the account address
       ethereum.on("accountsChanged", (accounts: string[]) => {
         if (accounts.length !== 0) {
@@ -193,7 +193,7 @@ export const MetaMaskClient = () => {
           setMetamaskAccountAddress("");
         }
       });
-  
+
       // cleanup by removing listeners
       return () => {
         ethereum.removeAllListeners("accountsChanged");
