@@ -4,7 +4,7 @@
       "@types/node": "16.18.31",
       "@types/react": "18.2.6",
       "@types/react-dom": "18.2.4",
-      "@bladelabs/blade-web3.js": "0.9.14",
+      "@bladelabs/blade-web3.js": "0.10.2",
       "@emotion/react": "11.11.0",
       "@emotion/styled": "11.11.0",
       "@hashgraph/sdk": "2.25.0",
