@@ -105,7 +105,7 @@ class MetaMaskWallet implements WalletInterface {
     }
   }
 
-  async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
+  async transferFungibleToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     const hash = await this.executeContractFunction(
       ContractId.fromString(tokenId.toString()),
       'transfer',
@@ -120,7 +120,35 @@ class MetaMaskWallet implements WalletInterface {
           name: "amount",
           value: amount
         }),
-      appConfig.constants.METAMASK_GAS_LIMIT_TRANSFER
+      appConfig.constants.METAMASK_GAS_LIMIT_TRANSFER_FT
+    );
+
+    return hash;
+  }
+
+  async transferNonFungibleToken(toAddress: AccountId, tokenId: TokenId, serialNumber: number) {
+    const provider = getProvider();
+    const addresses = await provider.listAccounts();
+    const hash = await this.executeContractFunction(
+      ContractId.fromString(tokenId.toString()),
+      'transferFrom',
+      new ContractFunctionParameterBuilder()
+        .addParam({
+          type: "address",
+          name: "from",
+          value: addresses[0]
+        })
+        .addParam({
+          type: "address",
+          name: "to",
+          value: this.convertAccountIdToSolidityAddress(toAddress)
+        })
+        .addParam({
+          type: "uint256",
+          name: "nftId",
+          value: serialNumber
+        }),
+      appConfig.constants.METAMASK_GAS_LIMIT_TRANSFER_NFT
     );
 
     return hash;
@@ -128,6 +156,7 @@ class MetaMaskWallet implements WalletInterface {
 
   async associateToken(tokenId: TokenId) {
     // send the transaction
+    // convert tokenId to contract id
     const hash = await this.executeContractFunction(
       ContractId.fromString(tokenId.toString()),
       'associate',
@@ -154,7 +183,7 @@ class MetaMaskWallet implements WalletInterface {
       const txResult = await contract[functionName](
         ...functionParameters.buildEthersParams(),
         {
-          gasLimit: gasLimit
+          gasLimit: gasLimit === -1 ? undefined : gasLimit
         }
       );
       return txResult.hash;

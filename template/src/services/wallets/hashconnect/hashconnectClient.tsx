@@ -33,13 +33,25 @@ class HashConnectWallet implements WalletInterface {
     return txResult.transactionId;
   }
 
-  async transferToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
+  async transferFungibleToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     // Grab the topic and account to sign from the last pairing event
     const signer = this.getSigner();
 
     const transferTokenTransaction = await new TransferTransaction()
       .addTokenTransfer(tokenId, signer.getAccountId(), -amount)
       .addTokenTransfer(tokenId, toAddress, amount)
+      .freezeWithSigner(signer);
+
+    const txResult = await transferTokenTransaction.executeWithSigner(signer);
+    return txResult.transactionId;
+  }
+
+  async transferNonFungibleToken(toAddress: AccountId, tokenId: TokenId, serialNumber: number) {
+    // Grab the topic and account to sign from the last pairing event
+    const signer = this.getSigner();
+
+    const transferTokenTransaction = await new TransferTransaction()
+      .addNftTransfer(tokenId, serialNumber, signer.getAccountId(), toAddress)
       .freezeWithSigner(signer);
 
     const txResult = await transferTokenTransaction.executeWithSigner(signer);
