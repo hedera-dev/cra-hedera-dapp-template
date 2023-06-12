@@ -1,0 +1,28 @@
+{
+  "name": "cra-hedera-dapp-template",
+  "version": "1.0.0",
+  "keywords": [
+    "react",
+    "create-react-app",
+    "template",
+    "typescript",
+    "hedera",
+    "material-ui",
+    "mui"
+  ],
+  "description": "Hedera dApp Starter Template using Create React App Template, Material UI and Typescript with HashPack, Blade, and MetaMask wallet support.",
+  "main": "template.json",
+  "repository": {
+    "type": "git",
+    "url": "",
+    "directory": ""
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "template",
+    "template.json"
+  ]
+}
