@@ -1,6 +1,6 @@
 // Reason: We need to build HAPI contract functions params
 // And we want the string contract function params that ethers exepects
-// This is an opportunity for the builder pattern.
+// This is an opportunity for the adapter pattern.
 
 import { ContractFunctionParameters } from "@hashgraph/sdk";
 
