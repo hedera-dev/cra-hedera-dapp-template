@@ -9,5 +9,6 @@ Hedera DApp Starter Template using Create React App, Material UI and Typescript 
 
 ### How to use
 1. Clone the repo
-2. Execute the below command
+2. Execute the following:
+
 ```npx create-react-app <my-app-name> --template file:../path/to/your/template/cra-template-[template-name] ```
