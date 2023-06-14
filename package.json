@@ -1,6 +1,6 @@
 {
   "name": "cra-hedera-dapp-template",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [
     "react",
     "create-react-app",
@@ -14,7 +14,7 @@
   "main": "template.json",
   "repository": {
     "type": "git",
-    "url": "",
+    "url": "https://www.npmjs.com/package/cra-hedera-dapp-template",
     "directory": ""
   },
   "license": "Apache-2.0",
