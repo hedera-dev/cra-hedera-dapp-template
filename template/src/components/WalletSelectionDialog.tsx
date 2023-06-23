@@ -2,6 +2,8 @@ import { Button, Dialog, Stack } from "@mui/material";
 import { connectToBladeWallet } from "../services/wallets/blade/bladeClient";
 import { hashConnect } from "../services/wallets/hashconnect/hashconnectClient";
 import { connectToMetamask } from "../services/wallets/metamask/metamaskClient";
+import HashPackLogo from "../assets/hashpack-logo.svg";
+import MetamaskLogo from "../assets/metamask-logo.svg";
 
 
 interface WalletSelectionDialogProps {
@@ -21,6 +23,14 @@ export const WalletSelectionDialog = (props: WalletSelectionDialogProps) => {
             hashConnect.connectToLocalWallet();
           }}
         >
+          <img
+            src={HashPackLogo}
+            alt='hashpack logo'
+            className='walletLogoImage'
+            style={{
+              marginLeft: '-6px'
+            }}
+          />
           HashPack
         </Button>
         <Button
@@ -33,10 +43,18 @@ export const WalletSelectionDialog = (props: WalletSelectionDialogProps) => {
         </Button>
         <Button
           variant="contained"
-          onClick={() => { 
-            connectToMetamask(); 
+          onClick={() => {
+            connectToMetamask();
           }}
         >
+          <img
+            src={MetamaskLogo}
+            alt='metamask logo'
+            className='walletLogoImage'
+            style={{
+              padding: '4px 4px 4px 0px'
+            }}
+          />
           Metamask
         </Button>
       </Stack>

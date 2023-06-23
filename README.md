@@ -2,14 +2,15 @@
 
 Hedera DApp Starter Template using Create React App, Material UI and Typescript with HashPack, Blade, and MetaMask wallet support.
 
-### The template offers:
+## Technologies
 
 * Multi-wallet integration out of the box (HashPack, Blade, & MetaMask)
 * Mirror Node Client
 * State management via React Context
 * Material UI
 
-### How to use
+
+## Usage
 
 Execute the following command, replacing `<my-app-name>` with the directory name you wish to create for the new project.
 
@@ -18,10 +19,16 @@ npx create-react-app <my-app-name> --template git+ssh://git@github.com/hedera-de
 ```
 ## Contributing
 
-You may wish to `git clone` this repo locally first, and then make changes there.
+- Create a fork of this repo on github
+- Clone that forked copy using github
+- Make you changes on a new branch
+- Submit a PR against the `main` branch of this copy of the git repo
 
 For testing during local development, execute the following command.
 
 ```shell
 npx create-react-app <my-app-name> --template file:../path/to/your/template/cra-hedera-dapp-template
-``
+```
+
+## License
+Apache 2.0
