@@ -21,7 +21,7 @@ npx create-react-app <my-app-name> --template git+ssh://git@github.com/hedera-de
 
 - Create a fork of this repo on github
 - Clone that forked copy using github
-- Make you changes on a new branch
+- Make your changes on a new branch
 - Submit a PR against the `main` branch of this copy of the git repo
 
 For testing during local development, execute the following command.
