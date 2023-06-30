@@ -1,4 +1,4 @@
-import { BladeSigner, HederaNetwork } from "@bladelabs/blade-web3.js";
+import { BladeConnector, HederaNetwork } from "@bladelabs/blade-web3.js";
 import { AccountId, ContractExecuteTransaction, ContractId, TokenAssociateTransaction, TokenId, TransferTransaction } from "@hashgraph/sdk";
 import EventEmitter from "events";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -13,7 +13,7 @@ const appMetadata = {
   network: env,
   dAppCode: "hederaCraTemplate",
 };
-export const bladeSigner = new BladeSigner();
+const bladeConnector = new BladeConnector();
 
 // We need an event emitter to trigger syncWithBladeSession and syncWithBladeDisconnected
 // from outside of the BladeClient component.
@@ -27,6 +27,11 @@ const syncWithBladeEvent = new EventEmitter();
 
 class BladeWallet implements WalletInterface {
   async transferHBAR(toAddress: AccountId, amount: number) {
+    const bladeSigner = bladeConnector.getSigner();
+    if (!bladeSigner) {
+      return null;
+    }
+    
     const transferHBARTransaction = await new TransferTransaction()
       .addHbarTransfer(bladeSigner.getAccountId().toString(), -amount)
       .addHbarTransfer(toAddress, amount)
@@ -42,6 +47,11 @@ class BladeWallet implements WalletInterface {
   }
 
   async transferFungibleToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
+    const bladeSigner = bladeConnector.getSigner();
+    if (!bladeSigner) {
+      return null;
+    }
+
     const transferTokenTransaction = await new TransferTransaction()
       .addTokenTransfer(tokenId, bladeSigner.getAccountId().toString(), -amount)
       .addTokenTransfer(tokenId, toAddress, amount)
@@ -57,6 +67,11 @@ class BladeWallet implements WalletInterface {
   }
 
   async transferNonFungibleToken(toAddress: AccountId, tokenId: TokenId, serialNumber: number) {
+    const bladeSigner = bladeConnector.getSigner();
+    if (!bladeSigner) {
+      return null;
+    }
+
     const transferTokenTransaction = await new TransferTransaction()
       .addNftTransfer(tokenId, serialNumber, bladeSigner.getAccountId().toString(), toAddress)
       .freezeWithSigner(bladeSigner);
@@ -71,6 +86,11 @@ class BladeWallet implements WalletInterface {
   }
 
   async associateToken(tokenId: TokenId) {
+    const bladeSigner = bladeConnector.getSigner();
+    if (!bladeSigner) {
+      return null;
+    }
+
     const associateTokenTransaction = await new TokenAssociateTransaction()
       .setAccountId(bladeSigner.getAccountId().toString())
       .setTokenIds([tokenId])
@@ -88,6 +108,11 @@ class BladeWallet implements WalletInterface {
   // Purpose: build contract execute transaction and send to hashconnect for signing and execution
   // Returns: Promise<TransactionId | null>
   async executeContractFunction(contractId: ContractId, functionName: string, functionParameters: ContractFunctionParameterBuilder, gasLimit: number) {
+    const bladeSigner = bladeConnector.getSigner();
+    if (!bladeSigner) {
+      return null;
+    }
+
     // Grab the topic and account to sign from the last pairing event
     const tx = new ContractExecuteTransaction()
       .setContractId(contractId)
@@ -116,9 +141,9 @@ export const bladeWallet = new BladeWallet();
 export const connectToBladeWallet = async (skipKillSession: boolean = false) => {
   try {
     if (!skipKillSession) {
-      await bladeSigner.killSession(); // kill any existing session to allow pairing a new account
+      await bladeConnector.killSession(); // kill any existing session to allow pairing a new account
     }
-    await bladeSigner.createSession(appMetadata);
+    await bladeConnector.createSession(appMetadata);
     syncWithBladeEvent.emit("syncSession");
     localStorage.setItem(bladeLocalStorage, "true");
   } catch (error) {
@@ -135,8 +160,9 @@ export const BladeClient = () => {
   // sync with blade state with the context so the context is aware of connected account id
   const syncWithBladeSession = useCallback(() => {
     try {
-      const accountId = bladeSigner.getAccountId();
-      if (accountId) {
+      const bladeSigner = bladeConnector.getSigner();
+      if (bladeSigner) {
+        const accountId = bladeSigner.getAccountId();
         setAccountId(accountId.toString());
         setIsConnected(true);
       } else {
