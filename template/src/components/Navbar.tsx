@@ -39,7 +39,7 @@ export default function NavBar() {
           {accountId ? `Connected: ${accountId}` : 'Connect Wallet'}
         </Button>
       </Toolbar>
-      <WalletSelectionDialog open={open} onClose={() => setOpen(false)} />
+      <WalletSelectionDialog open={open} setOpen={setOpen} onClose={() => setOpen(false)} />
     </AppBar>
   )
 }

@@ -20,7 +20,6 @@ npx create-react-app <my-app-name> --template git+ssh://git@github.com/hedera-de
 1. Execute ```npm i```
 2. Execute ```npm run start``` to start the project
 
-> Blade requires the use of HTTPS in order to pair wallets. An `.env` file exists in your root directory with `HTTPS=true` in order to connect to blade.
 ## Contributing
 
 - Create a fork of this repo on github
