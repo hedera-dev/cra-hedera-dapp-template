@@ -1,18 +1,18 @@
 import { Button, Dialog, Stack } from "@mui/material";
-import { connectToBladeWallet } from "../services/wallets/blade/bladeClient";
-import { hashConnect } from "../services/wallets/hashconnect/hashconnectClient";
 import { connectToMetamask } from "../services/wallets/metamask/metamaskClient";
-import HashPackLogo from "../assets/hashpack-logo.svg";
+import { openWalletConnectModal } from "../services/wallets/walletconnect/walletConnectClient";
 import MetamaskLogo from "../assets/metamask-logo.svg";
+import WalletConnectLogo from "../assets/walletconnect-logo.svg";
 
 
 interface WalletSelectionDialogProps {
   open: boolean;
+  setOpen: (value: boolean) => void;
   onClose: (value: string) => void;
 }
 
 export const WalletSelectionDialog = (props: WalletSelectionDialogProps) => {
-  const { onClose, open } = props;
+  const { onClose, open, setOpen } = props;
 
   return (
     <Dialog onClose={onClose} open={open}>
@@ -20,26 +20,19 @@ export const WalletSelectionDialog = (props: WalletSelectionDialogProps) => {
         <Button
           variant="contained"
           onClick={() => {
-            hashConnect.connectToLocalWallet();
+            openWalletConnectModal()
+            setOpen(false);
           }}
         >
           <img
-            src={HashPackLogo}
-            alt='hashpack logo'
+            src={WalletConnectLogo}
+            alt='walletconnect logo'
             className='walletLogoImage'
             style={{
               marginLeft: '-6px'
             }}
           />
-          HashPack
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => {
-            connectToBladeWallet();
-          }}
-        >
-          Blade
+          WalletConnect
         </Button>
         <Button
           variant="contained"
