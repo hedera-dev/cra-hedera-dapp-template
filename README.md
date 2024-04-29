@@ -20,6 +20,10 @@ npx create-react-app <my-app-name> --template git+ssh://git@github.com/hedera-de
 1. Execute ```npm i```
 2. Execute ```npm run start``` to start the project
 
+## Tutorial
+Curious to see this template in action?
+Check out the Create a [Hedera DApp Integrated with WalletConnect tutorial](https://docs.hedera.com/hedera/tutorials/more-tutorials/develop-a-hedera-dapp-integrated-with-walletconnect).
+
 ## Contributing
 
 - Create a fork of this repo on github
