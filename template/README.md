@@ -15,7 +15,7 @@ Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera
 
 
 ### Kabila Wallet
-* Install the [Kabila extention](https://www.kabila.app/wallet).
+* Install the [Kabila extension](https://www.kabila.app/wallet).
 
 ### Metamask Wallet
 * Install the [MetaMask extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn).
