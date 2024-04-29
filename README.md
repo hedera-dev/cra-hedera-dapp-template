@@ -4,7 +4,7 @@ Hedera DApp Starter Template using Create React App, Material UI and Typescript 
 
 ## Technologies
 
-* Multi-wallet integration out of the box (HashPack, Blade, & MetaMask)
+* Multi-wallet integration out of the box (HashPack, Blade, Kabila, & MetaMask)
 * Mirror Node Client
 * State management via React Context
 * Material UI
