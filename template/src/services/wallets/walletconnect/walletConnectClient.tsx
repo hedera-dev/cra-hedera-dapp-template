@@ -67,6 +67,8 @@ class WalletConnectWallet implements WalletInterface {
       .addHbarTransfer(this.accountId, -amount)
       .addHbarTransfer(toAddress, amount);
 
+  if (!this.signer) { console.log('No signers found!') }      
+
     await transferHBARTransaction.freezeWithSigner(this.signer);
     const txResult = await transferHBARTransaction.executeWithSigner(this.signer);
     return txResult ? txResult.transactionId : null;
