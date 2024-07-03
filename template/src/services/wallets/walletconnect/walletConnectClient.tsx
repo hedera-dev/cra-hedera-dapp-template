@@ -52,54 +52,58 @@ export const openWalletConnectModal = async () => {
 };
 
 class WalletConnectWallet implements WalletInterface {
-  private get signer() {
+  private getSigner() {
+    if (dappConnector.signers.length === 0) {
+      throw new Error('No signers found!');
+    }
     return dappConnector.signers[0];
-  } 
+  }
 
-  private get accountId() {
+  private getAccountId() {
     // Need to convert from walletconnect's AccountId to hashgraph/sdk's AccountId because walletconnect's AccountId and hashgraph/sdk's AccountId are not the same!
-    return AccountId.fromString(this.signer.getAccountId().toString());
+    return AccountId.fromString(this.getSigner().getAccountId().toString());
   }
 
   async transferHBAR(toAddress: AccountId, amount: number) {
-    console.log(this.accountId);
     const transferHBARTransaction = new TransferTransaction()
-      .addHbarTransfer(this.accountId, -amount)
+      .addHbarTransfer(this.getAccountId(), -amount)
       .addHbarTransfer(toAddress, amount);
 
-  if (!this.signer) { console.log('No signers found!') }      
-
-    await transferHBARTransaction.freezeWithSigner(this.signer);
-    const txResult = await transferHBARTransaction.executeWithSigner(this.signer);
+    const signer = this.getSigner();
+    await transferHBARTransaction.freezeWithSigner(signer);
+    const txResult = await transferHBARTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
   async transferFungibleToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     const transferTokenTransaction = new TransferTransaction()
-      .addTokenTransfer(tokenId, this.accountId, -amount)
+      .addTokenTransfer(tokenId, this.getAccountId(), -amount)
       .addTokenTransfer(tokenId, toAddress.toString(), amount);
 
-    await transferTokenTransaction.freezeWithSigner(this.signer);
-    const txResult = await transferTokenTransaction.executeWithSigner(this.signer);
+    const signer = this.getSigner();
+    await transferTokenTransaction.freezeWithSigner(signer);
+    const txResult = await transferTokenTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
   async transferNonFungibleToken(toAddress: AccountId, tokenId: TokenId, serialNumber: number) {
     const transferTokenTransaction = new TransferTransaction()
-      .addNftTransfer(tokenId, serialNumber, this.accountId, toAddress);
+      .addNftTransfer(tokenId, serialNumber, this.getAccountId(), toAddress);
 
-    await transferTokenTransaction.freezeWithSigner(this.signer);
-    const txResult = await transferTokenTransaction.executeWithSigner(this.signer);
+    const signer = this.getSigner();
+    await transferTokenTransaction.freezeWithSigner(signer);
+    const txResult = await transferTokenTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
   async associateToken(tokenId: TokenId) {
     const associateTokenTransaction = new TokenAssociateTransaction()
-      .setAccountId(this.accountId)
+      .setAccountId(this.getAccountId())
       .setTokenIds([tokenId]);
 
-    await associateTokenTransaction.freezeWithSigner(this.signer);
-    const txResult = await associateTokenTransaction.executeWithSigner(this.signer);
+    const signer = this.getSigner();
+    await associateTokenTransaction.freezeWithSigner(signer);
+    const txResult = await associateTokenTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
@@ -111,8 +115,9 @@ class WalletConnectWallet implements WalletInterface {
       .setGas(gasLimit)
       .setFunction(functionName, functionParameters.buildHAPIParams());
 
-    await tx.freezeWithSigner(this.signer);
-    const txResult = await tx.executeWithSigner(this.signer);
+    const signer = this.getSigner();
+    await tx.freezeWithSigner(signer);
+    const txResult = await tx.executeWithSigner(signer);
 
     // in order to read the contract call results, you will need to query the contract call's results form a mirror node using the transaction id
     // after getting the contract call results, use ethers and abi.decode to decode the call_result
