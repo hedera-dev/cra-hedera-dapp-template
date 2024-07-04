@@ -52,77 +52,58 @@ export const openWalletConnectModal = async () => {
 };
 
 class WalletConnectWallet implements WalletInterface {
-  private accountId() {
-    // Need to convert from walletconnect's AccountId to hashgraph/sdk's AccountId because walletconnect's AccountId and hashgraph/sdk's AccountId are not the same!
-    return AccountId.fromString(dappConnector.signers[0].getAccountId().toString());
-  }
-
-  // can be replaced when walletconnect provides a signer that satisfies Transaction.executeWithSigner
-  private async signAndExecuteTransaction(transaction: Transaction) {
-    const params: SignAndExecuteTransactionParams = {
-      signerAccountId: `::${this.accountId().toString()}`, // dApps seem to expect two colons in front of the signerAccountId, I'm not sure why. Hoping this gets cleaned up by wallets and walletconnect.
-      transactionList: transactionToBase64String(transaction)
-    };
-    /**
-     * this is not working as expected according to walletconnect's type definitions for dappConnector.signAndExecuteTransaction
-     * 
-     * For HashPack, needed to put in try-catch because hashpack was throwing execptions in dappConnector.signAndExecuteTransaction
-     * For Blade, dappConnector.signAndExecuteTransaction does not throw, but result.result is always undefined. So everywhere that this result is used, I had to add something like `txResult ? txResult.transactionId : null`
-     * Basically for either wallet, the transactionId is not usable.
-     */
-    try {
-      const result = await dappConnector.signAndExecuteTransaction(params);
-      return result.result;
-    } catch {
-      return null;
+  private getSigner() {
+    if (dappConnector.signers.length === 0) {
+      throw new Error('No signers found!');
     }
+    return dappConnector.signers[0];
   }
 
-  // can be replaced when walletconnect provides a signer that satisfies Transaction.freezeWithSigner
-  private freezeTx(transaction: Transaction) {
-    const nodeAccountIds = hederaClient._network.getNodeAccountIdsForExecute();
-    return transaction
-      .setTransactionId(TransactionId.generate(this.accountId()))
-      .setNodeAccountIds(nodeAccountIds)
-      .freeze();
+  private getAccountId() {
+    // Need to convert from walletconnect's AccountId to hashgraph/sdk's AccountId because walletconnect's AccountId and hashgraph/sdk's AccountId are not the same!
+    return AccountId.fromString(this.getSigner().getAccountId().toString());
   }
 
   async transferHBAR(toAddress: AccountId, amount: number) {
     const transferHBARTransaction = new TransferTransaction()
-      .addHbarTransfer(this.accountId(), -amount)
+      .addHbarTransfer(this.getAccountId(), -amount)
       .addHbarTransfer(toAddress, amount);
 
-    const frozenTx = this.freezeTx(transferHBARTransaction);
-    const txResult = await this.signAndExecuteTransaction(frozenTx);
+    const signer = this.getSigner();
+    await transferHBARTransaction.freezeWithSigner(signer);
+    const txResult = await transferHBARTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
   async transferFungibleToken(toAddress: AccountId, tokenId: TokenId, amount: number) {
     const transferTokenTransaction = new TransferTransaction()
-      .addTokenTransfer(tokenId, this.accountId(), -amount)
+      .addTokenTransfer(tokenId, this.getAccountId(), -amount)
       .addTokenTransfer(tokenId, toAddress.toString(), amount);
 
-    const frozenTx = this.freezeTx(transferTokenTransaction);
-    const txResult = await this.signAndExecuteTransaction(frozenTx);
+    const signer = this.getSigner();
+    await transferTokenTransaction.freezeWithSigner(signer);
+    const txResult = await transferTokenTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
   async transferNonFungibleToken(toAddress: AccountId, tokenId: TokenId, serialNumber: number) {
     const transferTokenTransaction = new TransferTransaction()
-      .addNftTransfer(tokenId, serialNumber, this.accountId(), toAddress);
+      .addNftTransfer(tokenId, serialNumber, this.getAccountId(), toAddress);
 
-    const frozenTx = this.freezeTx(transferTokenTransaction);
-    const txResult = await this.signAndExecuteTransaction(frozenTx);
+    const signer = this.getSigner();
+    await transferTokenTransaction.freezeWithSigner(signer);
+    const txResult = await transferTokenTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
   async associateToken(tokenId: TokenId) {
     const associateTokenTransaction = new TokenAssociateTransaction()
-      .setAccountId(this.accountId())
+      .setAccountId(this.getAccountId())
       .setTokenIds([tokenId]);
 
-    const frozenTx = this.freezeTx(associateTokenTransaction);
-    const txResult = await this.signAndExecuteTransaction(frozenTx);
+    const signer = this.getSigner();
+    await associateTokenTransaction.freezeWithSigner(signer);
+    const txResult = await associateTokenTransaction.executeWithSigner(signer);
     return txResult ? txResult.transactionId : null;
   }
 
@@ -134,8 +115,9 @@ class WalletConnectWallet implements WalletInterface {
       .setGas(gasLimit)
       .setFunction(functionName, functionParameters.buildHAPIParams());
 
-    const frozenTx = this.freezeTx(tx);
-    const txResult = await this.signAndExecuteTransaction(frozenTx);
+    const signer = this.getSigner();
+    await tx.freezeWithSigner(signer);
+    const txResult = await tx.executeWithSigner(signer);
 
     // in order to read the contract call results, you will need to query the contract call's results form a mirror node using the transaction id
     // after getting the contract call results, use ethers and abi.decode to decode the call_result
