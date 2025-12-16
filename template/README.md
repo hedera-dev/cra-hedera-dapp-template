@@ -4,7 +4,7 @@ Hedera DApp Starter Template using Create React App, Material UI and Typescript 
 
 ### Hedera Testnet account
 
-Don't have one? Create one by going to [portal.hedera.com](https://portal.hedera.com/register). The daily limit is 1000 test HBAR and users will be able to request for a refill every 24 hours!
+Don't have one? Create one by going to [portal.hedera.com](https://hubs.ly/Q03Yhr3j0). The daily limit is 1000 test HBAR and users will be able to request for a refill every 24 hours!
 
 ### Hashpack Wallet
 * Install the [Hashpack extension](https://chrome.google.com/webstore/detail/hashpack/gjagmgiddbbciopjhllkdnddhcglnemk).  
