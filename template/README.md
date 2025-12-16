@@ -23,8 +23,7 @@ Don't have one? Create one by going to [portal.hedera.com](https://hubs.ly/Q03Yh
 
 #### How to activate your account on Hedera Testnet
 
-Fund your account using our faucet at
-https://portal.hedera.com/faucet
+Fund your account using the [Hedera Faucet](https://hubs.ly/Q03YhV9b0)
 
 -----
 
